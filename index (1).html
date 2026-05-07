@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erming Design — 作品集</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        'off-white': '#FAFAFA',
+                        'warm-gray': '#F5F5F5',
+                        'light-gray': '#E5E5E5',
+                        'mid-gray': '#A3A3A3',
+                        'dark-gray': '#525252',
+                        'charcoal': '#262626',
+                        'near-black': '#1A1A1A',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; cursor: none; }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: #FAFAFA;
+            color: #1A1A1A;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Cursor */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .cursor-dot {
+            width: 5px;
+            height: 5px;
+            background-color: #1A1A1A;
+        }
+
+        .cursor-outline {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #1A1A1A;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        .cursor-outline.hover {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(26, 26, 26, 0.1);
+            border-color: transparent;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-outline.click {
+            width: 20px;
+            height: 20px;
+            background-color: #1A1A1A;
+        }
+
+        a, button, .project-card { cursor: none; }
+
+        /* Noise Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Scroll Animations */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-text.visible { opacity: 1; transform: translateY(0); }
+
+        .stagger-children > * {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .stagger-children.visible > *:nth-child(1) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(2) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(3) { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(4) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+
+        .line-draw {
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .line-draw.visible { width: 100%; }
+
+        /* Project Cards */
+        .project-card {
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .project-card:hover { transform: translateY(-8px); }
+
+        .project-card .project-image {
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: grayscale(10%);
+        }
+        .project-card:hover .project-image {
+            transform: scale(1.05);
+            filter: grayscale(0%);
+        }
+
+        .project-card .project-overlay {
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        .project-card:hover .project-overlay { opacity: 1; }
+
+        /* Filter Buttons */
+        .filter-btn {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .filter-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 1px;
+            background: #1A1A1A;
+            transition: width 0.3s ease;
+        }
+        .filter-btn.active::after { width: 100%; }
+        .filter-btn.active { color: #1A1A1A; }
+        .filter-btn:not(.active) { color: #A3A3A3; }
+
+        /* Navigation */
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(250, 250, 250, 0.8);
+        }
+
+        /* Background Typography */
+        .bg-text {
+            font-size: clamp(8rem, 20vw, 25rem);
+            line-height: 0.8;
+            color: transparent;
+            -webkit-text-stroke: 1px #E5E5E5;
+            position: absolute;
+            white-space: nowrap;
+            user-select: none;
+            pointer-events: none;
+            z-index: 0;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mobile-menu.open { transform: translateX(0); }
+
+        /* Selection */
+        ::selection { background: #1A1A1A; color: #FAFAFA; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #FAFAFA; }
+        ::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #A3A3A3; }
+
+        /* Mouse Follow Container */
+        .mouse-parallax {
+            transition: transform 0.2s ease-out;
+        }
+
+        /* Project Detail Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(250, 250, 250, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-content {
+            transform: translateY(50px);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        /* Image loading placeholder */
+        .img-loading {
+            background: linear-gradient(90deg, #F5F5F5 25%, #EBEBEB 50%, #F5F5F5 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
+
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Project Detail Modal -->
+    <div id="projectModal" class="modal-overlay">
+        <div class="h-full overflow-y-auto">
+            <div class="modal-content max-w-[1200px] mx-auto px-6 lg:px-12 py-20">
+                <button id="closeModal" class="fixed top-8 right-8 w-12 h-12 flex items-center justify-center text-near-black hover:rotate-90 transition-transform duration-300 z-10">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div id="modalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 nav-blur border-b border-light-gray/50">
+        <div class="max-w-[1400px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+            <a href="#hero" class="text-xl font-bold tracking-tight text-near-black hover:opacity-60 transition-opacity magnetic-btn">
+                Erming<span class="font-light text-mid-gray">/一鸣</span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-10">
+                <a href="#works" class="text-sm font-medium text-dark-gray hover:text-near-black transition-colors tracking-wide magnetic-btn">WORKS / 作品</a>
+                <a href="#about" class="text-sm font-medium text-dark-gray hover:text-near-black transition-colors tracking-wide magnetic-btn">ABOUT / 关于</a>
+                <a href="#contact" class="text-sm font-medium text-dark-gray hover:text-near-black transition-colors tracking-wide magnetic-btn">CONTACT / 联系</a>
+            </div>
+
+            <button id="menuBtn" class="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5">
+                <span class="w-6 h-[1.5px] bg-near-black transition-all duration-300"></span>
+                <span class="w-6 h-[1.5px] bg-near-black transition-all duration-300"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed inset-0 z-40 bg-off-white flex flex-col items-center justify-center gap-8">
+        <a href="#works" class="mobile-link text-3xl font-bold text-near-black">WORKS / 作品</a>
+        <a href="#about" class="mobile-link text-3xl font-bold text-near-black">ABOUT / 关于</a>
+        <a href="#contact" class="mobile-link text-3xl font-bold text-near-black">CONTACT / 联系</a>
+        <p class="mt-12 text-sm text-mid-gray">897787549@qq.com</p>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <div class="bg-text top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-black tracking-tighter" id="heroBgText">
+            PORTFOLIO
+        </div>
+
+        <div class="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 w-full">
+            <div class="grid lg:grid-cols-12 gap-8 items-end">
+                <div class="lg:col-span-8">
+                    <div class="reveal-text mb-6">
+                        <span class="text-sm font-medium text-mid-gray tracking-widest uppercase">Product Designer / 产品设计师</span>
+                    </div>
+                    <h1 class="reveal-text text-[clamp(3rem,8vw,8rem)] font-black leading-[0.9] tracking-tighter text-near-black mb-8 mouse-parallax" data-speed="0.02">
+                        CRAFTING<br>
+                        <span class="text-mid-gray">MINDFUL</span><br>
+                        MOMENTS<br>
+                        <span class="font-light text-dark-gray text-[0.5em] tracking-normal ml-2">创造正念时刻</span>
+                    </h1>
+                    <div class="reveal-text flex items-center gap-6 mouse-parallax" data-speed="0.03">
+                        <a href="#works" class="group inline-flex items-center gap-3 text-sm font-semibold text-near-black border-b border-near-black pb-1 hover:gap-5 transition-all magnetic-btn">
+                            VIEW WORKS
+                            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </a>
+                        <span class="text-mid-gray text-sm">GBA 大湾区 / Based in GBA</span>
+                    </div>
+                </div>
+                <div class="lg:col-span-4 hidden lg:block">
+                    <div class="reveal-text text-right mouse-parallax" data-speed="0.04">
+                        <p class="text-sm text-mid-gray leading-relaxed max-w-xs ml-auto">
+                            专注于生活方式产品设计与品牌视觉。以东方美学为根基，探索器物与日常的深层连接。
+                        </p>
+                        <div class="mt-8 flex justify-end gap-4">
+                            <span class="w-2 h-2 rounded-full bg-near-black animate-pulse"></span>
+                            <span class="text-xs text-mid-gray uppercase tracking-widest">Available for projects</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+            <span class="text-[10px] text-mid-gray uppercase tracking-widest">Scroll</span>
+            <div class="w-[1px] h-12 bg-light-gray relative overflow-hidden">
+                <div class="w-full h-1/2 bg-near-black animate-[shimmer_2s_infinite]"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Works Section -->
+    <section id="works" class="relative py-32 lg:py-40">
+        <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-20 gap-8">
+                <div>
+                    <div class="reveal-text mb-4">
+                        <span class="text-sm font-medium text-mid-gray tracking-widest uppercase">Selected Works / 精选作品</span>
+                    </div>
+                    <h2 class="reveal-text text-[clamp(2.5rem,5vw,5rem)] font-bold tracking-tighter text-near-black leading-none">
+                        PROJECTS<br>
+                        <span class="text-mid-gray font-light">项目集</span>
+                    </h2>
+                </div>
+
+                <div class="reveal-text flex flex-wrap gap-6 lg:gap-8">
+                    <button class="filter-btn active text-sm font-medium tracking-wide magnetic-btn" data-filter="all">ALL / 全部</button>
+                    <button class="filter-btn text-sm font-medium tracking-wide magnetic-btn" data-filter="product">PRODUCT / 产品</button>
+                    <button class="filter-btn text-sm font-medium tracking-wide magnetic-btn" data-filter="branding">BRANDING / 品牌</button>
+                </div>
+            </div>
+
+            <div class="line-draw h-[1px] bg-light-gray mb-16"></div>
+
+            <!-- PROJECTS CONTAINER -->
+            <div id="projectsGrid" class="grid md:grid-cols-2 gap-8 lg:gap-12 stagger-children"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="relative py-32 lg:py-40 bg-warm-gray">
+        <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
+            <div class="grid lg:grid-cols-12 gap-16 lg:gap-24">
+                <div class="lg:col-span-5">
+                    <div class="reveal-text sticky top-32">
+                        <span class="text-sm font-medium text-mid-gray tracking-widest uppercase block mb-6">About / 关于</span>
+                        <h2 class="text-[clamp(2rem,4vw,4rem)] font-bold tracking-tighter text-near-black leading-none mb-8">
+                            DESIGN IS<br>
+                            THINKING<br>
+                            MADE VISUAL<br>
+                            <span class="text-mid-gray font-light text-[0.6em] block mt-2">设计是可视化的思考</span>
+                        </h2>
+                        <div class="line-draw h-[1px] bg-light-gray mb-8"></div>
+                        <p class="text-mid-gray text-sm leading-relaxed max-w-sm">
+                            专注于生活方式产品设计与品牌视觉。以东方美学为根基，探索器物与日常的深层连接。相信好的设计是隐形的——它应该自然融入生活，而非刻意展示。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 space-y-16">
+                    <div class="reveal-text">
+                        <h3 class="text-sm font-semibold text-near-black tracking-widest uppercase mb-8">EXPERTISE / 专长</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="group">
+                                <div class="text-2xl font-bold text-near-black mb-2 group-hover:text-dark-gray transition-colors">01</div>
+                                <div class="text-sm font-medium text-near-black mb-1">Product Design</div>
+                                <div class="text-xs text-mid-gray">产品造型设计</div>
+                            </div>
+                            <div class="group">
+                                <div class="text-2xl font-bold text-near-black mb-2 group-hover:text-dark-gray transition-colors">02</div>
+                                <div class="text-sm font-medium text-near-black mb-1">Brand Identity</div>
+                                <div class="text-xs text-mid-gray">品牌识别设计</div>
+                            </div>
+                            <div class="group">
+                                <div class="text-2xl font-bold text-near-black mb-2 group-hover:text-dark-gray transition-colors">03</div>
+                                <div class="text-sm font-medium text-near-black mb-1">Art Direction</div>
+                                <div class="text-xs text-mid-gray">艺术指导</div>
+                            </div>
+                            <div class="group">
+                                <div class="text-2xl font-bold text-near-black mb-2 group-hover:text-dark-gray transition-colors">04</div>
+                                <div class="text-sm font-medium text-near-black mb-1">Visual Storytelling</div>
+                                <div class="text-xs text-mid-gray">视觉叙事</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reveal-text">
+                        <h3 class="text-sm font-semibold text-near-black tracking-widest uppercase mb-8">EXPERIENCE / 经历</h3>
+                        <div class="space-y-6">
+                            <div class="flex justify-between items-baseline border-b border-light-gray pb-4">
+                                <div>
+                                    <div class="text-near-black font-medium">Product Designer</div>
+                                    <div class="text-sm text-mid-gray">Independent Studio / 独立工作室</div>
+                                </div>
+                                <span class="text-sm text-mid-gray">2024 — NOW</span>
+                            </div>
+                            <div class="flex justify-between items-baseline border-b border-light-gray pb-4">
+                                <div>
+                                    <div class="text-near-black font-medium">Brand Designer</div>
+                                    <div class="text-sm text-mid-gray">Design Agency / 设计公司</div>
+                                </div>
+                                <span class="text-sm text-mid-gray">2021 — 2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="relative py-32 lg:py-48">
+        <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
+            <div class="grid lg:grid-cols-12 gap-16">
+                <div class="lg:col-span-8">
+                    <div class="reveal-text mb-12">
+                        <span class="text-sm font-medium text-mid-gray tracking-widest uppercase block mb-6">Contact / 联系</span>
+                        <h2 class="text-[clamp(2.5rem,6vw,7rem)] font-bold tracking-tighter text-near-black leading-[0.9] mb-8">
+                            LET'S CREATE<br>
+                            <span class="text-mid-gray">SOMETHING</span><br>
+                            TOGETHER<br>
+                            <span class="font-light text-dark-gray text-[0.4em] tracking-normal ml-2">一起创造些什么</span>
+                        </h2>
+                    </div>
+
+                    <div class="reveal-text">
+                        <a href="mailto:897787549@qq.com" class="group inline-flex items-center gap-4 text-xl lg:text-2xl font-semibold text-near-black border-b-2 border-near-black pb-2 hover:gap-6 transition-all magnetic-btn">
+                            897787549@qq.com
+                            <svg class="w-6 h-6 transition-transform group-hover:translate-x-2 group-hover:-translate-y-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 lg:pt-32">
+                    <div class="reveal-text space-y-8">
+                        <div>
+                            <div class="text-xs text-mid-gray uppercase tracking-widest mb-2">Social / 社交</div>
+                            <div class="space-y-2">
+                                <a href="#" class="block text-near-black hover:text-mid-gray transition-colors text-sm font-medium magnetic-btn">Instagram</a>
+                                <a href="#" class="block text-near-black hover:text-mid-gray transition-colors text-sm font-medium magnetic-btn">Behance</a>
+                                <a href="#" class="block text-near-black hover:text-mid-gray transition-colors text-sm font-medium magnetic-btn">Dribbble</a>
+                                <a href="#" class="block text-near-black hover:text-mid-gray transition-colors text-sm font-medium magnetic-btn">LinkedIn</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-xs text-mid-gray uppercase tracking-widest mb-2">Location / 位置</div>
+                            <p class="text-sm text-near-black">GBA 大湾区<br>Greater Bay Area, China</p>
+                        </div>
+
+                        <div>
+                            <div class="text-xs text-mid-gray uppercase tracking-widest mb-2">Availability / 可接项目</div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                <span class="text-sm text-near-black">Open for freelance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-light-gray py-12">
+        <div class="max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-mid-gray tracking-wide"> Erming Design. ALL RIGHTS RESERVED.</p>
+            <p class="text-xs text-mid-gray tracking-wide">DESIGNED & DEVELOPED WITH INTENTION</p>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // PROJECTS DATA - 慢擂 · 一碗茶
+        // ============================================
+        const projectsData = [
+            {
+                id: 1,
+                title: "慢擂 · 一碗茶",
+                titleCN: "Product Design / 产品设计",
+                category: "product",
+                year: "2026.04",
+                image: "./product-hero.png",
+                description: "以传统擂茶文化为灵感，将东方茶道仪式融入现代生活方式。选用天然陶土与植物蜡，在器物中保留手作温度。每一碗茶，都是一次与自我对话的正念时刻。 / Inspired by traditional Lei Cha tea culture, integrating Eastern tea ceremony rituals into modern lifestyle. Using natural clay and plant wax to preserve handcrafted warmth in every object. Each bowl of tea is a mindful moment of self-dialogue.",
+                images: [
+                    "./product-hero.png",
+                    "./tea-culture.png",
+                    "./meditation.png",
+                    "./daily-life.png"
+                ]
+            }
+        ];
+
+        // ============================================
+        // RENDER PROJECTS
+        // ============================================
+        function renderProjects(filter = 'all') {
+            const grid = document.getElementById('projectsGrid');
+            grid.innerHTML = '';
+
+            const filtered = filter === 'all' 
+                ? projectsData 
+                : projectsData.filter(p => p.category === filter);
+
+            filtered.forEach(project => {
+                const card = document.createElement('article');
+                card.className = 'project-card group';
+                card.setAttribute('data-category', project.category);
+                card.innerHTML = `
+                    <div class="relative aspect-[4/3] overflow-hidden bg-warm-gray mb-6">
+                        <img src="${project.image}" 
+                             alt="${project.title}" 
+                             class="project-image w-full h-full object-cover"
+                             loading="lazy"
+                             onload="this.classList.remove('img-loading')"
+                             onerror="this.src='https://via.placeholder.com/800x600?text=Image+Loading'">
+                        <div class="project-overlay absolute inset-0 bg-near-black/60 flex items-center justify-center">
+                            <span class="text-white text-sm font-medium tracking-widest uppercase border border-white/30 px-6 py-3">View Project</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-semibold text-near-black mb-1 group-hover:text-dark-gray transition-colors">${project.title}</h3>
+                            <p class="text-sm text-mid-gray">${project.titleCN}</p>
+                        </div>
+                        <span class="text-sm text-mid-gray font-light">${project.year}</span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(project));
+                grid.appendChild(card);
+            });
+
+            setTimeout(() => {
+                grid.classList.remove('visible');
+                void grid.offsetWidth;
+                grid.classList.add('visible');
+            }, 50);
+        }
+
+        // ============================================
+        // PROJECT MODAL
+        // ============================================
+        const modal = document.getElementById('projectModal');
+        const modalBody = document.getElementById('modalBody');
+        const closeModalBtn = document.getElementById('closeModal');
+
+        function openModal(project) {
+            modalBody.innerHTML = `
+                <div class="mb-12">
+                    <span class="text-sm text-mid-gray tracking-widest uppercase">${project.titleCN}</span>
+                    <h2 class="text-[clamp(2rem,5vw,4rem)] font-bold tracking-tighter text-near-black mt-4 mb-6">${project.title}</h2>
+                    <p class="text-mid-gray leading-relaxed max-w-2xl text-lg">${project.description}</p>
+                    <div class="mt-6 flex items-center gap-4">
+                        <span class="text-sm text-mid-gray">${project.year}</span>
+                        <span class="w-1 h-1 rounded-full bg-mid-gray"></span>
+                        <span class="text-sm text-mid-gray uppercase tracking-wide">${project.category}</span>
+                    </div>
+                </div>
+                <div class="space-y-8">
+                    ${project.images.map((img, index) => `
+                        <div class="aspect-[16/10] overflow-hidden bg-warm-gray">
+                            <img src="${img}" alt="${project.title} - ${index + 1}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" loading="lazy">
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-16 pt-8 border-t border-light-gray flex justify-between items-center">
+                    <span class="text-sm text-mid-gray">Project ${project.id} / ${projectsData.length}</span>
+                    <button onclick="closeModalFunc()" class="text-sm font-semibold text-near-black hover:text-mid-gray transition-colors magnetic-btn">Close / 关闭</button>
+                </div>
+            `;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModalFunc() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        closeModalBtn.addEventListener('click', closeModalFunc);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModalFunc();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModalFunc();
+        });
+
+        // ============================================
+        // CUSTOM CURSOR
+        // ============================================
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        let mouseX = 0, mouseY = 0;
+        let outlineX = 0, outlineY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.left = `${mouseX}px`;
+            cursorDot.style.top = `${mouseY}px`;
+        });
+
+        function animateCursor() {
+            outlineX += (mouseX - outlineX) * 0.15;
+            outlineY += (mouseY - outlineY) * 0.15;
+            cursorOutline.style.left = `${outlineX}px`;
+            cursorOutline.style.top = `${outlineY}px`;
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        const interactiveElements = document.querySelectorAll('a, button, .project-card, .magnetic-btn');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursorOutline.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursorOutline.classList.remove('hover'));
+            el.addEventListener('mousedown', () => cursorOutline.classList.add('click'));
+            el.addEventListener('mouseup', () => cursorOutline.classList.remove('click'));
+        });
+
+        // ============================================
+        // MOUSE PARALLAX EFFECT
+        // ============================================
+        document.addEventListener('mousemove', (e) => {
+            const parallaxElements = document.querySelectorAll('.mouse-parallax');
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            parallaxElements.forEach(el => {
+                const speed = parseFloat(el.getAttribute('data-speed')) || 0.02;
+                const x = (e.clientX - centerX) * speed;
+                const y = (e.clientY - centerY) * speed;
+                el.style.transform = `translate(${x}px, ${y}px)`;
+            });
+
+            const bgText = document.getElementById('heroBgText');
+            if (bgText) {
+                const x = (e.clientX - centerX) * -0.01;
+                const y = (e.clientY - centerY) * -0.01;
+                bgText.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+            }
+        });
+
+        // ============================================
+        // SCROLL OBSERVER
+        // ============================================
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-text, .stagger-children, .line-draw').forEach(el => {
+            observer.observe(el);
+        });
+
+        // ============================================
+        // FILTER FUNCTIONALITY
+        // ============================================
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.getAttribute('data-filter');
+                renderProjects(filter);
+            });
+        });
+
+        // ============================================
+        // MOBILE MENU
+        // ============================================
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        let isMenuOpen = false;
+
+        menuBtn.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            mobileMenu.classList.toggle('open', isMenuOpen);
+
+            const lines = menuBtn.querySelectorAll('span');
+            if (isMenuOpen) {
+                lines[0].style.transform = 'rotate(45deg) translate(2px, 2px)';
+                lines[1].style.transform = 'rotate(-45deg) translate(2px, -2px)';
+            } else {
+                lines[0].style.transform = 'none';
+                lines[1].style.transform = 'none';
+            }
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                isMenuOpen = false;
+                mobileMenu.classList.remove('open');
+                const lines = menuBtn.querySelectorAll('span');
+                lines[0].style.transform = 'none';
+                lines[1].style.transform = 'none';
+            });
+        });
+
+        // ============================================
+        // SMOOTH SCROLL
+        // ============================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ============================================
+        // MAGNETIC BUTTON EFFECT
+        // ============================================
+        if (window.matchMedia('(pointer: fine)').matches) {
+            document.querySelectorAll('.magnetic-btn').forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                });
+
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0, 0)';
+                });
+            });
+        }
+
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        window.addEventListener('load', () => {
+            renderProjects();
+            document.querySelectorAll('#hero .reveal-text').forEach((el, i) => {
+                setTimeout(() => el.classList.add('visible'), i * 150);
+            });
+        });
+
+        const projectsGrid = document.getElementById('projectsGrid');
+        observer.observe(projectsGrid);
+    </script>
+</body>
+</html>
