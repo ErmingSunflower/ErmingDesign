@@ -5,497 +5,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio — 陈一鸣 ErminG</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
-                    },
-                    colors: {
-                        'off-white': '#FAFAFA',
-                        'warm-gray': '#F5F5F5',
-                        'light-gray': '#E5E5E5',
-                        'mid-gray': '#A3A3A3',
-                        'dark-gray': '#525252',
-                        'charcoal': '#262626',
-                        'near-black': '#1A1A1A',
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        /* 恢复默认鼠标指针 */
-        html { scroll-behavior: smooth; cursor: auto; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
 
-        body {
-            font-family: 'Inter', 'Noto Sans SC', sans-serif;
-            background-color: #FAFAFA;
-            color: #1A1A1A;
-            overflow-x: hidden;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #FFFFFF; 
+            color: #000000; 
+            font-family: Arial, sans-serif; 
+            overflow-x: hidden; 
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 原有的 Custom Cursor 样式已移除，恢复标准交互体验 */
+        /* 模拟矢量拉伸的 Arial */
+        .distorted-font {
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            display: inline-block;
+            transform: scaleY(1.3); /* 纵向拉伸 */
+            letter-spacing: -0.05em;
+            line-height: 0.8;
+        }
 
-        /* Noise Overlay */
-        .noise-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+        /* 顶部翻转的 Portfolio */
+        .portfolio-bg {
+            font-size: 28vw;
+            transform: scaleY(1.5) rotate(180deg);
+            position: absolute;
+            top: -10vw;
+            left: -5vw;
+            white-space: nowrap;
+            z-index: 0;
             pointer-events: none;
-            z-index: 9998;
-            opacity: 0.025;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
         }
 
-        /* Scroll Animations */
-        .reveal-text {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        /* 20% 透明度的 ERMING */
+        .erming-bg {
+            font-size: 32vw;
+            color: rgba(0, 0, 0, 0.2);
+            transform: scaleY(1.2);
+            position: absolute;
+            top: 25vw;
+            left: -2vw;
+            white-space: nowrap;
+            z-index: 0;
+            pointer-events: none;
         }
-        .reveal-text.visible { opacity: 1; transform: translateY(0); }
 
-        .stagger-children > * {
+        /* 那个关键的灰色圆点 */
+        .i-dot {
+            width: 4vw;
+            height: 4vw;
+            background-color: #D1D5DB; /* 浅灰色 */
+            border-radius: 50%;
+            position: absolute;
+            top: 24.5vw;
+            left: 60vw;
+            z-index: 1;
+        }
+
+        /* 内容容器 */
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            padding-top: 55vw; /* 给顶部的巨大文字留出空间 */
+        }
+
+        /* 技能部分的超压缩字体 */
+        .skill-title {
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            font-size: 8rem;
+            line-height: 0.85;
+            transform: scaleX(0.6); /* 横向压缩 */
+            transform-origin: left;
+            display: block;
+            margin-bottom: 2rem;
+        }
+
+        .reveal-on-scroll {
             opacity: 0;
             transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 1s ease-out;
         }
-        .stagger-children.visible > *:nth-child(1) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
-        .stagger-children.visible > *:nth-child(2) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
-        .stagger-children.visible > *:nth-child(3) { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
-        .stagger-children.visible > *:nth-child(4) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
-        .stagger-children.visible > *:nth-child(5) { transition-delay: 0.5s; opacity: 1; transform: translateY(0); }
-        .stagger-children.visible > *:nth-child(6) { transition-delay: 0.6s; opacity: 1; transform: translateY(0); }
-
-        .line-draw {
-            width: 0;
-            transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .line-draw.visible { width: 100%; }
-
-        /* Project Cards - 保留设计师喜欢的动效 */
-        .project-card {
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: pointer;
-        }
-        .project-card:hover { transform: translateY(-8px); }
-
-        .project-card .project-image {
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            filter: grayscale(20%);
-        }
-        .project-card:hover .project-image {
-            transform: scale(1.05);
-            filter: grayscale(0%);
-        }
-
-        .project-card .project-overlay {
-            opacity: 0;
-            transition: all 0.4s ease;
-        }
-        .project-card:hover .project-overlay { opacity: 1; }
-
-        /* Filter Buttons */
-        .filter-btn {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        .filter-btn::after {
-            content: '';
-            position: absolute;
-            bottom: -4px; left: 0;
-            width: 0; height: 1px;
-            background: #1A1A1A;
-            transition: width 0.3s ease;
-        }
-        .filter-btn.active::after { width: 100%; }
-        .filter-btn.active { color: #1A1A1A; }
-        .filter-btn:not(.active) { color: #A3A3A3; }
-
-        /* Navigation */
-        .nav-blur {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(250, 250, 250, 0.8);
-        }
-
-        /* Background Typography */
-        .bg-text {
-            font-size: clamp(8rem, 20vw, 25rem);
-            line-height: 0.8;
-            color: transparent;
-            -webkit-text-stroke: 1px #E5E5E5;
-            position: absolute;
-            white-space: nowrap;
-            user-select: none;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Mobile Menu */
-        .mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .mobile-menu.open { transform: translateX(0); }
-
-        ::selection { background: #1A1A1A; color: #FAFAFA; }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #FAFAFA; }
-        ::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #A3A3A3; }
-
-        /* Project Detail Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(250, 250, 250, 0.95);
-            backdrop-filter: blur(20px);
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .modal-overlay.active {
+        .reveal-on-scroll.visible {
             opacity: 1;
-            pointer-events: all;
-        }
-        .modal-content {
-            transform: translateY(50px);
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .modal-overlay.active .modal-content {
             transform: translateY(0);
         }
+
+        /* 响应式：允许超出边缘已经在样式中通过负数 left 和大字号实现 */
     </style>
 </head>
 <body>
 
-    <div class="noise-overlay"></div>
-
-    <div id="projectModal" class="modal-overlay">
-        <div class="h-full overflow-y-auto">
-            <div class="modal-content max-w-[1200px] mx-auto px-6 lg:px-12 py-20">
-                <button id="closeModal" class="fixed top-8 right-8 w-12 h-12 flex items-center justify-center text-near-black hover:rotate-90 transition-transform duration-300 z-10">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-                <div id="modalBody"></div>
-            </div>
-        </div>
+    <div class="relative w-full h-0">
+        <div class="portfolio-bg distorted-font" id="parallaxPortfolio">PORTFOLIO</div>
+        <div class="erming-bg distorted-font" id="parallaxErming">ERMING</div>
+        <div class="i-dot"></div>
     </div>
 
-    <nav class="fixed top-0 left-0 w-full z-50 nav-blur border-b border-light-gray/50">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
-            <a href="#hero" class="text-xl font-bold tracking-tight text-near-black hover:opacity-60 transition-opacity">
-                ErminG<span class="font-light text-mid-gray"> / 陈一鸣</span>
-            </a>
-
-            <div class="hidden md:flex items-center gap-10">
-                <a href="#works" class="text-sm font-medium text-dark-gray hover:text-near-black transition-colors tracking-wide">WORKS / 作品</a>
-                <a href="#about" class="text-sm font-medium text-dark-gray hover:text-near-black transition-colors tracking-wide">ABOUT / 关于</a>
-                <a href="#contact" class="text-sm font-medium text-dark-gray hover:text-near-black transition-colors tracking-wide">CONTACT / 联系</a>
-            </div>
-
-            <button id="menuBtn" class="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5">
-                <span class="w-6 h-[1.5px] bg-near-black transition-all duration-300"></span>
-                <span class="w-6 h-[1.5px] bg-near-black transition-all duration-300"></span>
-            </button>
+    <nav class="fixed top-0 left-0 w-full z-[100] px-12 py-8 flex justify-between items-center mix-blend-difference">
+        <div class="text-xl font-bold tracking-tighter">ERMING / 陈一鸣</div>
+        <div class="space-x-8 text-sm font-bold uppercase tracking-widest">
+            <a href="#about">About</a>
+            <a href="#works">Works</a>
         </div>
     </nav>
 
-    <div id="mobileMenu" class="mobile-menu fixed inset-0 z-40 bg-off-white flex flex-col items-center justify-center gap-8">
-        <a href="#works" class="mobile-link text-3xl font-bold text-near-black">WORKS / 作品</a>
-        <a href="#about" class="mobile-link text-3xl font-bold text-near-black">ABOUT / 关于</a>
-        <a href="#contact" class="mobile-link text-3xl font-bold text-near-black">CONTACT / 联系</a>
-        <p class="mt-12 text-sm text-mid-gray">hello@erming.design</p>
-    </div>
-
-    <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        <div class="bg-text top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-black tracking-tighter" id="heroBgText">
-            ERMING
-        </div>
-
-        <div class="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 w-full">
-            <div class="grid lg:grid-cols-12 gap-8 items-end">
-                <div class="lg:col-span-8">
-                    <div class="reveal-text mb-6">
-                        <span class="text-sm font-medium text-mid-gray tracking-widest uppercase">Independent Designer / 独立设计师</span>
-                    </div>
-                    <h1 class="reveal-text text-[clamp(3rem,8vw,8rem)] font-black leading-[0.9] tracking-tighter text-near-black mb-8">
-                        CRAFTING<br>
-                        <span class="text-mid-gray">DIGITAL</span><br>
-                        EXPERIENCES<br>
-                        <span class="font-light text-dark-gray text-[0.5em] tracking-normal ml-2">创造数字体验</span>
-                    </h1>
-                    <div class="reveal-text flex items-center gap-6">
-                        <a href="#works" class="group inline-flex items-center gap-3 text-sm font-semibold text-near-black border-b border-near-black pb-1 hover:gap-5 transition-all">
-                            VIEW WORKS
-                            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                            </svg>
-                        </a>
-                        <span class="text-mid-gray text-sm">基于上海 / Based in Shanghai</span>
-                    </div>
-                </div>
-                <div class="lg:col-span-4 hidden lg:block">
-                    <div class="reveal-text text-right">
-                        <p class="text-sm text-mid-gray leading-relaxed max-w-xs ml-auto">
-                            专注于品牌视觉、界面设计与数字艺术创作。以极简主义美学为核心，探索功能与美学的边界。
-                        </p>
-                        <div class="mt-8 flex justify-end gap-4">
-                            <span class="w-2 h-2 rounded-full bg-near-black animate-pulse"></span>
-                            <span class="text-xs text-mid-gray uppercase tracking-widest">Available for projects</span>
-                        </div>
-                    </div>
-                </div>
+    <main class="content-layer px-12 pb-32">
+        
+        <section id="about" class="grid lg:grid-cols-12 gap-8 mb-40">
+            <div class="lg:col-span-4">
+                <h2 class="text-5xl font-black tracking-tighter border-b-4 border-black inline-block pb-2">ABOUT ME</h2>
             </div>
-        </div>
-
-        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-            <span class="text-[10px] text-mid-gray uppercase tracking-widest">Scroll</span>
-            <div class="w-[1px] h-12 bg-light-gray relative overflow-hidden">
-                <div class="w-full h-1/2 bg-near-black animate-[shimmer_2s_infinite]"></div>
+            <div class="lg:col-span-8 text-lg leading-relaxed text-gray-800 font-medium">
+                我是 <span class="font-bold">陈一鸣 ErminG</span> 一名工业设计专业学生，热衷于探索新颖创意与突破常规的思考与表达。<br>
+                擅长打造兼具思考深度与传播价值的设计项目，能根据不同任务需求与媒介形式灵活调整个人风格。<br>
+                既能独立高效完成工作，也擅长团队协作，始终保持开放学习的心态。
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="works" class="relative py-32 lg:py-40">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-20 gap-8">
+        <section class="relative grid lg:grid-cols-12 gap-12 items-end">
+            <div class="lg:col-span-5 relative">
+                <img src="me.png" alt="陈一鸣" class="w-full grayscale hover:grayscale-0 transition-all duration-700 reveal-on-scroll">
+            </div>
+
+            <div class="lg:col-span-7">
+                <div class="mb-20">
+                    <span class="skill-title">HARD<br>SKILLS</span>
+                    <p class="text-sm tracking-widest leading-loose">
+                        品牌 / 视觉识别设计：标志设计、品牌手册、效果 mockup、社交媒体物料<br>
+                        用户界面 / 用户体验设计：网页与移动端界面设计、交互原型制作<br>
+                        周边产品设计：品牌衍生产品视觉设计，系列化产品设计
+                    </p>
+                </div>
+
                 <div>
-                    <div class="reveal-text mb-4">
-                        <span class="text-sm font-medium text-mid-gray tracking-widest uppercase">Selected Works / 精选作品</span>
-                    </div>
-                    <h2 class="reveal-text text-[clamp(2.5rem,5vw,5rem)] font-bold tracking-tighter text-near-black leading-none">
-                        PROJECTS<br>
-                        <span class="text-mid-gray font-light">项目集</span>
-                    </h2>
-                </div>
-
-                <div class="reveal-text flex flex-wrap gap-6 lg:gap-8">
-                    <button class="filter-btn active text-sm font-medium tracking-wide" data-filter="all">ALL / 全部</button>
-                    <button class="filter-btn text-sm font-medium tracking-wide" data-filter="branding">BRANDING / 品牌</button>
-                    <button class="filter-btn text-sm font-medium tracking-wide" data-filter="ui">UI/UX / 界面</button>
-                    <button class="filter-btn text-sm font-medium tracking-wide" data-filter="art">ART / 艺术</button>
-                </div>
-            </div>
-
-            <div class="line-draw h-[1px] bg-light-gray mb-16"></div>
-            <div id="projectsGrid" class="grid md:grid-cols-2 gap-8 lg:gap-12 stagger-children"></div>
-        </div>
-    </section>
-
-    <section id="about" class="relative py-32 lg:py-40 bg-warm-gray">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
-            <div class="grid lg:grid-cols-12 gap-16 lg:gap-24">
-                <div class="lg:col-span-5">
-                    <div class="reveal-text sticky top-32">
-                        <span class="text-sm font-medium text-mid-gray tracking-widest uppercase block mb-6">About / 关于</span>
-                        <h2 class="text-[clamp(2rem,4vw,4rem)] font-bold tracking-tighter text-near-black leading-none mb-8">
-                            DESIGN IS<br>
-                            THINKING<br>
-                            MADE VISUAL<br>
-                            <span class="text-mid-gray font-light text-[0.6em] block mt-2">设计是可视化的思考</span>
-                        </h2>
-                        <div class="line-draw h-[1px] bg-light-gray mb-8"></div>
-                        <p class="text-mid-gray text-sm leading-relaxed max-w-sm">
-                            陈一鸣 (ErminG)，5年设计经验，专注于将复杂的概念转化为简洁有力的视觉语言。相信好的设计是隐形的——它应该自然融入生活。
-                        </p>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-7 space-y-16">
-                    <div class="reveal-text">
-                        <h3 class="text-sm font-semibold text-near-black tracking-widest uppercase mb-8">EXPERTISE / 专长</h3>
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="group">
-                                <div class="text-2xl font-bold text-near-black mb-2">01</div>
-                                <div class="text-sm font-medium text-near-black mb-1">Brand Identity</div>
-                                <div class="text-xs text-mid-gray">品牌识别设计</div>
-                            </div>
-                            <div class="group">
-                                <div class="text-2xl font-bold text-near-black mb-2">02</div>
-                                <div class="text-sm font-medium text-near-black mb-1">UI/UX Design</div>
-                                <div class="text-xs text-mid-gray">界面与体验设计</div>
-                            </div>
-                            <div class="group">
-                                <div class="text-2xl font-bold text-near-black mb-2">03</div>
-                                <div class="text-sm font-medium text-near-black mb-1">Art Direction</div>
-                                <div class="text-xs text-mid-gray">艺术指导</div>
-                            </div>
-                            <div class="group">
-                                <div class="text-2xl font-bold text-near-black mb-2">04</div>
-                                <div class="text-sm font-medium text-near-black mb-1">Motion Design</div>
-                                <div class="text-xs text-mid-gray">动态设计</div>
-                            </div>
+                    <span class="skill-title">SOFTWARE<br>SKILLS</span>
+                    <div class="grid grid-cols-3 gap-8 text-xs font-bold tracking-widest uppercase">
+                        <div class="space-y-2">
+                            <p class="text-gray-400 mb-4">常用设计软件</p>
+                            <p>Rhino</p><p>Keyshot</p><p>Adobe Photoshop</p>
                         </div>
-                    </div>
-
-                    <div class="reveal-text">
-                        <h3 class="text-sm font-semibold text-near-black tracking-widest uppercase mb-8">EXPERIENCE / 经历</h3>
-                        <div class="space-y-6">
-                            <div class="flex justify-between items-baseline border-b border-light-gray pb-4">
-                                <div>
-                                    <div class="text-near-black font-medium">Senior Designer</div>
-                                    <div class="text-sm text-mid-gray">FREE-LANCE / 独立设计师</div>
-                                </div>
-                                <span class="text-sm text-mid-gray">2022 — NOW</span>
-                            </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-400 mb-4">交互/动画软件</p>
+                            <p>Figma</p><p>Premiere Pro</p><p>After Effects</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-400 mb-4">辅助工具</p>
+                            <p>Blender</p><p>Open AI</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section id="contact" class="relative py-32 lg:py-48">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
-            <div class="grid lg:grid-cols-12 gap-16">
-                <div class="lg:col-span-8">
-                    <div class="reveal-text mb-12">
-                        <span class="text-sm font-medium text-mid-gray tracking-widest uppercase block mb-6">Contact / 联系</span>
-                        <h2 class="text-[clamp(2.5rem,6vw,7rem)] font-bold tracking-tighter text-near-black leading-[0.9] mb-8">
-                            LET'S CREATE<br>
-                            TOGETHER<br>
-                            <span class="font-light text-dark-gray text-[0.4em] tracking-normal ml-2">一起创造些什么</span>
-                        </h2>
-                    </div>
-
-                    <div class="reveal-text">
-                        <a href="mailto:hello@erming.design" class="group inline-flex items-center gap-4 text-xl lg:text-2xl font-semibold text-near-black border-b-2 border-near-black pb-2 hover:gap-6 transition-all">
-                            hello@erming.design
-                            <svg class="w-6 h-6 transition-transform group-hover:translate-x-2 group-hover:-translate-y-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="border-t border-light-gray py-12">
-        <div class="max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-xs text-mid-gray tracking-wide"> ERMING DESIGN. ALL RIGHTS RESERVED.</p>
-            <p class="text-xs text-mid-gray tracking-wide">MADE BY ERMING WITH PASSION</p>
-        </div>
-    </footer>
+        </section>
+    </main>
 
     <script>
-        // 项目数据
-        const projectsData = [
-            {
-                id: 1,
-                title: "NOIR ATELIER",
-                titleCN: "Brand Identity / 品牌识别",
-                category: "branding",
-                year: "2024",
-                image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?w=800&q=80",
-                description: "为高端时装工作室打造的精致品牌识别系统。",
-                images: ["https://images.unsplash.com/photo-1600607686527-6fb886090705?w=1200&q=80"]
-            },
-            {
-                id: 2,
-                title: "FLOW DASHBOARD",
-                titleCN: "UI/UX Design / 界面设计",
-                category: "ui",
-                year: "2024",
-                image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80",
-                description: "为企业分析设计的数据可视化仪表板。",
-                images: ["https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&q=80"]
-            }
-        ];
-
-        // 渲染逻辑
-        function renderProjects(filter = 'all') {
-            const grid = document.getElementById('projectsGrid');
-            grid.innerHTML = '';
-            const filtered = filter === 'all' ? projectsData : projectsData.filter(p => p.category === filter);
-
-            filtered.forEach(project => {
-                const card = document.createElement('article');
-                card.className = 'project-card group';
-                card.innerHTML = `
-                    <div class="relative aspect-[4/3] overflow-hidden bg-warm-gray mb-6">
-                        <img src="${project.image}" class="project-image w-full h-full object-cover">
-                        <div class="project-overlay absolute inset-0 bg-near-black/60 flex items-center justify-center">
-                            <span class="text-white text-sm font-medium tracking-widest uppercase border border-white/30 px-6 py-3">View Project</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-xl font-semibold text-near-black mb-1 group-hover:text-dark-gray transition-colors">${project.title}</h3>
-                            <p class="text-sm text-mid-gray">${project.titleCN}</p>
-                        </div>
-                        <span class="text-sm text-mid-gray font-light">${project.year}</span>
-                    </div>
-                `;
-                card.addEventListener('click', () => openModal(project));
-                grid.appendChild(card);
-            });
-            setTimeout(() => grid.classList.add('visible'), 50);
-        }
-
-        // 基础交互脚本
-        const menuBtn = document.getElementById('menuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('open');
-            const spans = menuBtn.querySelectorAll('span');
-            spans[0].classList.toggle('rotate-45');
-            spans[0].classList.toggle('translate-y-2');
-            spans[1].classList.toggle('-rotate-45');
-            spans[1].classList.toggle('-translate-y-0.5');
+        // 视差动效脚本
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const port = document.getElementById('parallaxPortfolio');
+            const erm = document.getElementById('parallaxErming');
+            
+            // PORTFOLIO 向左移，ERMING 向右移
+            port.style.transform = `scaleY(1.5) rotate(180deg) translateX(${scrolled * 0.2}px)`;
+            erm.style.transform = `scaleY(1.2) translateX(${-scrolled * 0.1}px)`;
         });
 
-        // 弹窗逻辑
-        const modal = document.getElementById('projectModal');
-        const modalBody = document.getElementById('modalBody');
-        const closeModal = document.getElementById('closeModal');
-        function openModal(project) {
-            modalBody.innerHTML = `<h2 class="text-4xl font-bold mb-4">${project.title}</h2><p>${project.description}</p><img src="${project.image}" class="mt-8 w-full">`;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        closeModal.addEventListener('click', () => {
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-
-        // 筛选逻辑
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                renderProjects(e.target.dataset.filter);
-            });
-        });
-
-        // 揭示动画
-        const observerOptions = { threshold: 0.1 };
+        // 滚动揭示动画
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('visible');
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
 
-        document.querySelectorAll('.reveal-text, .stagger-children, .line-draw').forEach(el => observer.observe(el));
-
-        // 初始化
-        renderProjects();
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
     </script>
 </body>
 </html>
